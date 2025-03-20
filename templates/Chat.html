@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+</head>
+<body>
+    <div class="container chat-container">
+        <h3 class="text-center">AI Medical Assistant Chatbot</h3>
+        <div id="chatBox" class="chat-box mb-3"></div>
+        <form id="chatbot-form" class="d-flex">
+            <input type="text" class="form-control me-2" placeholder="Enter Message" name="msg" id="msg" autofocus>
+            <button class="btn btn-info" type="submit">Send</button>
+        </form>
+    </div>
+    
+    <script>
+        $(document).ready(function () {
+            $('#chatbot-form').submit(function (e) {
+                e.preventDefault();
+                var message = $('#msg').val().trim();
+                if (!message) return;
+                
+                $('#chatBox').append(`<div class='user-message'>${message}</div><hr>`);
+                $('#msg').val('');
+                $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/get",
+                    data: { msg: message }, // Send as form data
+
+                    success: function (response) {
+                        console.log("Response :", response);
+                        var answer = response.trim();
+                        $('#chatBox').append(`<div class='bot-message'>${answer}</div><hr>`);
+                        $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+                    },
+                    error: function () {
+                        $('#chatBox').append("<div class='bot-message' style='color:red;'>Error processing request.</div><hr>");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
